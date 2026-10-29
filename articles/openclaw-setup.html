@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>UbuntuでOpenClawを自動起動するまでの記録</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">UbuntuでOpenClawを自動起動するまでの記録</h1>
+</header>
+<h1
+id="ubuntuでopenclawを自動起動するまでの記録">UbuntuでOpenClawを自動起動するまでの記録</h1>
+<p>ブログ「道東に暮らして」の制作にOpenClawを活用するため、Ubuntuでの自動起動設定から、ブログのファイル読み取り、記事作成までを進めました。途中でGatewayの二重起動にも遭遇しましたが、既存のプロセスを確認して停止し、サービスとして起動できました。</p>
+<p>この記事は、実際に確認した作業記録をもとにまとめたものです。自動起動やトラブル対応などは作業者から提供された確認記録を、HTMLの読み取りとMarkdown作成はこの会話で確認できた結果を反映しています。掲載コマンドは作業当時の記録であり、記事の修正にあたって再実行したものではありません。</p>
+<p>作業時の環境は次のとおりです。</p>
+<ul>
+<li>OS：Ubuntu 26.04.1 LTS</li>
+<li>OpenClaw：2026.10.9</li>
+<li>GitHub CLI：2.46.0</li>
+</ul>
+<h2 id="openclawを導入した目的">1. OpenClawを導入した目的</h2>
+<p>OpenClawを活用する目的は、ブログ「道東に暮らして」の制作を手伝ってもらうことです。このブログでは、北海道・十勝の大樹町を拠点に、歴史や自然、人の営みを記録します。</p>
+<p>既存のページを読み取って構成を説明してもらい、作業記録や地域の記録を記事にまとめることを目指しました。毎回手動でGatewayを起動する手間を減らすため、自動起動の設定も行いました。</p>
+<p>Linuxの操作では、コマンドの目的を一つずつ確認することを大切にしています。ファイルを読むだけの操作と、ファイルやシステムの設定を変更する操作を分け、変更する対象を明確にして進めました。</p>
+<h2 id="systemdによる自動起動設定">2. systemdによる自動起動設定</h2>
+<p>systemdは、Ubuntuでバックグラウンドのプログラムなどを管理する仕組みです。管理するプログラムの単位を「サービス」と呼びます。今回はOpenClawのGatewayを、ユーザー単位で管理するsystemdユーザーサービスとして登録しました。</p>
+<p><strong>手順1：Gatewayのサービスを登録する</strong></p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openclaw</span> gateway install</span></code></pre></div>
+<p>この操作で、systemdユーザーサービスとして登録しました。以降の確認に使ったサービス名は
+<code>openclaw-gateway.service</code> です。</p>
+<p><strong>手順2：自動起動が有効かを確認する</strong></p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> <span class="at">--user</span> is-enabled openclaw-gateway.service</span></code></pre></div>
+<p>結果は <code>enabled</code>
+でした。これはサービスの自動起動が有効になっていることを示します。<code>--user</code>
+は、システム全体ではなく、そのユーザーのサービスを操作する指定です。</p>
+<p><strong>手順3：現在の動作状態を確認する</strong></p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> <span class="at">--user</span> status openclaw-gateway.service <span class="at">--no-pager</span></span></code></pre></div>
+<p>結果は <code>active (running)</code>
+でした。サービスが現在動作していることを示します。<code>--no-pager</code>
+は、結果をページ送り用の画面に切り替えず表示する指定です。</p>
+<p><code>enabled</code> と <code>active (running)</code>
+は意味が違います。前者は自動起動の設定、後者は現在の動作状態を表します。</p>
+<p><strong>手順4：PCの再起動後にも確認する</strong></p>
+<p>PCを再起動した後、次のコマンドで確認しました。</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> <span class="at">--user</span> is-active openclaw-gateway.service</span></code></pre></div>
+<p>結果は <code>active</code>
+でした。再起動後の確認時にも、Gatewayが動作していることを確認できました。</p>
+<p>なお、ユーザーサービスの起動条件と、ログイン前からの動作は別の話です。この記録では、ログイン前の段階で動いていたかまでは扱わず、「PC再起動後の確認でactiveだった」という確認結果を記載しています。</p>
+<h2 id="gatewayの二重起動トラブルと解決">3.
+Gatewayの二重起動トラブルと解決</h2>
+<p>Gatewayは、OpenClawの接続ややり取りを支えるプログラムです。設定作業の途中で、Gatewayの起動が終了コード
+<code>78</code> で失敗するトラブルがありました。</p>
+<p>終了コードは、プログラムがどのように処理を終えたかを表す番号です。ただし、この番号だけで原因を決めつけず、ログを確認しました。</p>
+<p><strong>手順1：ログから既存Gatewayを確認する</strong></p>
+<p><code>journalctl</code> でログを確認したところ、PID
+<code>96988</code>
+の既存Gatewayが、同じ状態ディレクトリを使っていることが分かりました。状態ディレクトリとは、プログラムが動作に必要な状態を保存する場所です。PIDは、実行中のプログラムを識別する番号です。</p>
+<p>ログ確認に使った <code>journalctl</code>
+の詳しいオプションや、ログ全文は記録に含まれていないため、ここでは補っていません。</p>
+<p><strong>手順2：通常の停止操作を行う</strong></p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openclaw</span> gateway stop</span></code></pre></div>
+<p>この操作では既存のPIDが残りました。そこで、確認済みのプロセスに終了を要求しました。</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">kill</span> <span class="at">-TERM</span> 96988</span></code></pre></div>
+<p><code>-TERM</code>
+は、対象のプロセスに終了を要求する指定です。この操作で既存Gatewayを停止しました。</p>
+<p><strong>96988はこの作業時のPIDです。別の機会にそのまま使う番号ではありません。</strong>
+PIDは変わるため、同様の対応では対象を確認する必要があります。</p>
+<p><strong>手順3：ポートが解放されたことを確認する</strong></p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">ss</span> <span class="at">-ltnp</span> <span class="st">&#39;( sport = :18789 )&#39;</span></span></code></pre></div>
+<p>ポートは、通信を受け付ける窓口の番号です。このコマンドでTCPポート
+<code>18789</code>
+の待ち受け状態を調べ、ポートが解放されたことを確認しました。</p>
+<p><strong>手順4：systemdからGatewayを起動する</strong></p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">systemctl</span> <span class="at">--user</span> start openclaw-gateway.service</span></code></pre></div>
+<p>この操作で起動に成功しました。今回のトラブルは、既存Gatewayが残っていたことをログで確認し、それを停止してからサービスを起動することで解決しました。</p>
+<h2 id="github-cliのインストールと認証">4. GitHub
+CLIのインストールと認証</h2>
+<p>GitHub CLIは、GitHubをコマンドで操作するための道具です。コマンド名は
+<code>gh</code> です。</p>
+<p><strong>手順1：GitHub CLIをインストールする</strong></p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sudo</span> apt install gh</span></code></pre></div>
+<p>この操作でGitHub CLI <code>2.46.0</code>
+を導入しました。<code>apt install</code>
+はUbuntuでソフトをインストールする操作、<code>sudo</code>
+は管理者権限で実行するための指定です。</p>
+<p><strong>手順2：GitHubのアカウントで認証する</strong></p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> auth login</span></code></pre></div>
+<p>案内に沿って、次の選択をしました。</p>
+<ol type="1">
+<li>接続先は <code>GitHub.com</code>。</li>
+<li>接続方式は <code>HTTPS</code>。</li>
+<li>認証方法はブラウザ認証。</li>
+</ol>
+<p>結果として、GitHubアカウント <code>hs67-history</code>
+での認証に成功しました。認証とは、利用するアカウントを確認して、操作を許可する手続きです。</p>
+<h2 id="ブログ用リポジトリのコピー">5. ブログ用リポジトリのコピー</h2>
+<p>リポジトリは、ファイルとその変更履歴を管理する保管場所です。GitHub上のリポジトリを手元に複製することを「クローン」と呼びます。</p>
+<p><strong>手順1：ブログ用リポジトリをクローンする</strong></p>
+<p>対象は <code>hs67-history/doto-site</code> です。</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gh</span> repo clone hs67-history/doto-site ~/doto-site</span></code></pre></div>
+<p>このコマンドでクローンに成功しました。<code>~</code>
+は、そのユーザーのホームフォルダを表します。今回の保存先は
+<code>/home/hs67/doto-site</code> です。</p>
+<p><strong>手順2：記事を置くフォルダを作る</strong></p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> ~/doto-site/articles</span></code></pre></div>
+<p>記事用の <code>articles</code>
+フォルダを作成しました。<code>mkdir</code>
+はフォルダを作るコマンドで、<code>-p</code>
+は必要な親フォルダも作成し、対象のフォルダがすでにあってもエラーにしない指定です。</p>
+<p>ブログのトップページは
+<code>/home/hs67/doto-site/index.html</code>、今回の記事の保存先は
+<code>/home/hs67/doto-site/articles/openclaw-setup.md</code> です。</p>
+<p>クローンはGitHubから手元へコピーする操作です。手元で記事を書くだけでは、その記事が自動的にGitHubへ送られるわけではありません。</p>
+<h2 id="openclawのファイル読み取り設定">6.
+OpenClawのファイル読み取り設定</h2>
+<p>初期設定では、OpenClawの <code>tools.profile</code> は
+<code>minimal</code>
+でした。これは、OpenClawに使わせるツールの構成に関する設定です。</p>
+<p>最初の読み取り依頼では、アシスタントから「この会話で利用できるツールに、PC内のファイルを読み取る機能がない」という回答がありました。そこで、設定をバックアップした後、プロファイルを変更しました。</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">openclaw</span> config set tools.profile coding</span></code></pre></div>
+<p>変更後には、Gatewayの再起動は不要というメッセージが表示されました。その後、<code>index.html</code>
+の読み取りに成功しました。設定バックアップの具体的なコマンドや保存先は提供された記録にないため、ここでは記載していません。</p>
+<p>読み取りテストでは、ファイルの場所を省略しない「絶対パス」を使いました。実際に実行されたコマンドは次のとおりです。</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> /home/hs67/doto-site/index.html</span></code></pre></div>
+<p><code>cat</code>
+は、ファイルの内容を表示するコマンドです。この操作自体はファイルを書き換えません。結果としてHTMLの内容が表示され、終了コードは正常終了を示す
+<code>0</code> でした。</p>
+<p>読み取りによって、次の内容を確認できました。</p>
+<ul>
+<li>HTMLのタイトルは「道東に暮らして」。</li>
+<li>上部の説明文は「北海道・大樹町の歴史と自然を記録するブログ」。</li>
+<li>ナビゲーションは、歴史・地名・考古学・植物・鳥・昆虫・石碑・お店・産業の9項目。</li>
+<li>各項目は、同じページ内の対応する場所へ移動する構成。</li>
+<li>デザイン指定は、生成り色の背景、濃い青灰色の上部と最下部、白い角丸の枠。</li>
+</ul>
+<p>これはHTMLの内容とデザイン指定の確認であり、ブラウザ上での表示確認とは区別しています。また、ツールの設定変更は、あらゆるファイルの操作や公開を無条件に任せるという意味ではありません。実際の作業では、対象ファイルと変更の範囲をその都度指定します。</p>
+<h2 id="今後のブログ制作への活用">7. 今後のブログ制作への活用</h2>
+<p>ファイルの読み取りに続いて、OpenClawによるMarkdownファイルの作成にも成功しました。Markdownは、見出しや箇条書きを簡単な記号で書ける文章の形式です。今回の記事も、その形式で保存しています。</p>
+<p>これからは、地域の歴史や自然の観察記録を記事にまとめる作業に活用していきます。たとえば、次のような使い方が考えられます。</p>
+<ul>
+<li>観察メモを整理して、記事の見出しを作る。</li>
+<li>Linuxの作業記録を、初心者にも読みやすい文章にまとめる。</li>
+<li>既存の記事を読み取り、表現や構成を見直す。</li>
+<li>確認済みの事実と、これから調べることを分けて整理する。</li>
+</ul>
+<p>地域の歴史、地名の由来、動植物の名前は、資料や現地の記録と照らし合わせて確認します。AIの文章をそのまま事実とせず、今回のように実際の記録をもとに修正していくことを大切にします。</p>
+<p>今回、Gatewayのサービス登録と再起動後の動作確認、二重起動の解消、GitHub認証、リポジトリのクローン、HTMLの読み取り、Markdown記事の作成まで進めることができました。</p>
+<p>なお、今回の記事修正は <code>articles/openclaw-setup.md</code>
+だけを対象にしています。既存の <code>index.html</code>
+やシステム設定は変更せず、commitやpushも行っていません。commitは変更をGitの履歴に記録する操作、pushはその履歴をGitHubなどへ送る操作です。記事の保存と公開を分け、内容を確認しながら制作を進めていきます。</p>
+</body>
+</html>

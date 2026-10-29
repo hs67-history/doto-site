@@ -1,0 +1,25 @@
+body {
+  font-family: "Noto Serif CJK JP", "Yu Mincho", serif;
+  background-color: #f8f6f2;
+  color: #2c3e50;
+  line-height: 1.9;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+}
+
+a {
+  color: #27658a;
+}
+
+pre {
+  background: #eae7e1;
+  padding: 1em;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+code {
+  overflow-wrap: anywhere;
+}
